@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -9,9 +10,7 @@ namespace mpa.Models
   {
     private string UserID { get; set; }
     public int MemoID { get; set; }
-
-    public string Title { get; set; }
-
-    public string Content { get; set; }
+    public string? Title { get; set; }
+    public string? Content { get; set; }
   }
 }

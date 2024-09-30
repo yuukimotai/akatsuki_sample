@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using mpa.Areas.Identity.Data;
 using MyApplication.Data;
@@ -8,10 +10,25 @@ var connectionString = builder.Configuration.GetConnectionString("mpaIdentityDbC
 builder.Services.AddDbContext<mpaIdentityDbContext>(options => options.UseSqlServer(connectionString));
 builder.Services.AddDbContext<MemoDbContext>(options => options.UseSqlServer(connectionString));
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<mpaIdentityDbContext>();
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<mpaIdentityDbContext>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+// builder.Services.AddControllers(config =>
+// {
+//     var policy = new AuthorizationPolicyBuilder()
+//                      .RequireAuthenticatedUser()
+//                      .Build();
+//     config.Filters.Add(new AuthorizeFilter(policy));
+// });
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    // Default SignIn settings.
+    options.SignIn.RequireConfirmedEmail = false;
+    options.SignIn.RequireConfirmedPhoneNumber = false;
+});
 
 var app = builder.Build();
 

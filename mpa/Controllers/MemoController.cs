@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,13 +11,18 @@ using mpa.Models;
 
 namespace mpa.Controllers
 {
+    [Authorize]
     public class MemoController : Controller
     {
         private readonly MemoDbContext _context;
+        private readonly UserManager<IdentityUser> _usermanager;
+        private IHttpContextAccessor _httpContextAccessor;
 
-        public MemoController(MemoDbContext context)
+        public MemoController(MemoDbContext context, UserManager<IdentityUser> usermanager, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _usermanager = usermanager;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         // GET: Memo
@@ -31,7 +38,8 @@ namespace mpa.Controllers
             {
                 return NotFound();
             }
-
+            var contextUser = _httpContextAccessor.HttpContext.User;
+            var userId = _usermanager.GetUserId(contextUser);
             var memo = await _context.Memo
                 .FirstOrDefaultAsync(m => m.MemoID == id);
             if (memo == null)
